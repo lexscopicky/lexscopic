@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --radius: 16px; }
+body { background-image: linear-gradient(to bottom, #ffffff, #f8fafc); color: #0f172a; }
