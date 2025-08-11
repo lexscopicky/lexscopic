@@ -231,7 +231,7 @@ export default function Page() {
       </section>
 
       <footer className="border-t">
-        <div className="max-w-6xl mx_auto px-4 py-8 text-sm text-slate-600 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-slate-600 flex items-center justify-between">
           <p>© {new Date().getFullYear()} LexScopic. Curated in Lexington, KY.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:underline">About</a>
