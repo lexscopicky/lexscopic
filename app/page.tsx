@@ -139,7 +139,6 @@ export default function Page() {
     venue:'', neighborhood:'', price:0, tags:[], description:'', url:'', image:''
   })
 
-  // Featured is the first matching event, rest follow
   const featured = filtered[0]
   const rest = filtered.slice(1)
 
@@ -151,7 +150,6 @@ export default function Page() {
 
   return (
     <div className="min-h-screen">
-      {/* Top bar */}
       <header className="sticky top-0 z-40 backdrop-blur bg-white/70 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -166,7 +164,6 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Search + filters */}
       <section className="max-w-6xl mx-auto px-4 pt-6">
         <Card>
           <CardContent className="pt-4 space-y-3">
@@ -204,7 +201,6 @@ export default function Page() {
         </Card>
       </section>
 
-      {/* Main + Sidebar */}
       <section className="max-w-6xl mx-auto px-4 py-6 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           {featured && <EventCard evt={featured} large />}
@@ -235,7 +231,7 @@ export default function Page() {
       </section>
 
       <footer className="border-t">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-slate-600 flex items-center justify-between">
+        <div className="max-w-6xl mx_auto px-4 py-8 text-sm text-slate-600 flex items-center justify-between">
           <p>© {new Date().getFullYear()} LexScopic. Curated in Lexington, KY.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:underline">About</a>
@@ -245,7 +241,6 @@ export default function Page() {
         </div>
       </footer>
 
-      {/* Jotform: swap YOUR_FORM_ID to use it */}
       <Modal open={openSubmit} onClose={() => setOpenSubmit(false)} title="Submit an Event">
         <iframe
           src="https://form.jotform.com/YOUR_FORM_ID"
