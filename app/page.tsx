@@ -46,6 +46,7 @@ function TagPill({ tag }: { tag: string }) {
 function EventCard({ evt, large = false }: { evt: EventItem; large?: boolean }) {
   const priceText = formatMoney(evt.price)
   const weekend = isThisWeekend(evt.date)
+
   const gcalLink = (() => {
     const start = new Date(`${evt.date} ${evt.startTime}`).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
     const end = new Date(`${evt.date} ${evt.endTime}`).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
@@ -55,54 +56,66 @@ function EventCard({ evt, large = false }: { evt: EventItem; large?: boolean }) 
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}%2F${end}&details=${details}&location=${location}`
   })()
 
+  // Tidy card + consistent image ratios (no more giant images)
+  const aspectStyle = { aspectRatio: large ? '16 / 9' as const : '4 / 3' as const }
+
   return (
     <motion.div layout>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow">
-        {evt.image && (
-          <div className={large ? 'relative h-64 w-full overflow-hidden' : 'relative h-40 w-full overflow-hidden'}>
-            <img src={evt.image} alt="event" className="h-full w-full object-cover" />
-            <div className="absolute top-2 left-2 flex items-center gap-2">
-              {evt.sponsored && <Badge className="bg-yellow-400 text-black">Sponsored</Badge>}
-              {weekend && <Badge>This Weekend</Badge>}
+      <div className="overflow-hidden rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow">
+        {/* Image with fixed aspect ratio */}
+        <div className="relative w-full overflow-hidden" style={aspectStyle}>
+          <img
+            src={evt.image || '/og.png'}
+            alt={evt.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 ring-1 ring-black/5" />
+          <div className="absolute top-2 left-2 flex items-center gap-2">
+            {evt.sponsored && <Badge className="bg-yellow-400 text-black">Sponsored</Badge>}
+            {weekend && <Badge className="bg-brand-600">This Weekend</Badge>}
+          </div>
+        </div>
+
+        <div className="p-4">
+          <h3 className={`font-semibold ${large ? 'text-xl' : 'text-base'} line-clamp-2`}>
+            <a href={evt.url} target="_blank" rel="noreferrer" className="hover:underline">
+              {evt.title}
+            </a>
+          </h3>
+
+          <div className="mt-2 space-y-1 text-sm text-slate-600">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span>{new Date(evt.date).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' })}</span>
+              <Clock className="w-4 h-4 ml-3" />
+              <span>{evt.startTime} – {evt.endTime}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              <span>{evt.venue}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Ticket className="w-4 h-4" />
+              <span>{priceText}</span>
             </div>
           </div>
-        )}
-        <CardHeader className="pb-2">
-          <CardTitle className={large ? 'text-2xl' : 'text-lg'}>
-            <div className="flex items-start justify-between gap-2">
-              <span>{evt.title}</span>
-              <a href={evt.url} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm text-brand-600 hover:underline">
-                Details <ArrowUpRight className="w-4 h-4 ml-1" />
-              </a>
+
+          {evt.tags?.length ? (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {evt.tags.slice(0, 4).map(t => <TagPill key={t} tag={t} />)}
             </div>
-          </CardTitle>
-          <div className="flex flex-wrap gap-1 mt-1">
-            {evt.tags?.slice(0, 4).map((t) => <TagPill key={t} tag={t} />)}
+          ) : null}
+
+          <div className="mt-4 flex items-center justify-between">
+            <a href={gcalLink} target="_blank" rel="noreferrer">
+              <Button size="sm" variant="outline">Add to Calendar</Button>
+            </a>
+            <a href={evt.url} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm text-brand-600 hover:underline">
+              Details <ArrowUpRight className="w-4 h-4 ml-1" />
+            </a>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-slate-600">
-            <Calendar className="w-4 h-4" />
-            <span>{new Date(evt.date).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' })}</span>
-            <Clock className="w-4 h-4 ml-3" />
-            <span>{evt.startTime} – {evt.endTime}</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-600">
-            <MapPin className="w-4 h-4" />
-            <span>{evt.venue}</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-600">
-            <Ticket className="w-4 h-4" />
-            <span>{priceText}</span>
-          </div>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between">
-          <a href={gcalLink} target="_blank" rel="noreferrer">
-            <Button size="sm" variant="outline">Add to Google Calendar</Button>
-          </a>
-          <Button size="sm">Save</Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -150,10 +163,11 @@ export default function Page() {
 
   return (
     <div className="min-h-screen">
+      {/* Header */}
       <header className="sticky top-0 z-40 backdrop-blur bg-white/70 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="inline-grid place-items-center w-9 h-9 rounded-xl bg-brand-700 text-white font-bold">LX</span>
+            <span className="inline-grid place-items-center w-8 h-8 rounded-xl bg-brand-700 text-white font-bold">LX</span>
             <div className="leading-tight">
               <h1 className="text-xl font-extrabold">LexScopic</h1>
               <p className="text-xs text-slate-500">Free & affordable things to do in Lexington</p>
@@ -164,7 +178,8 @@ export default function Page() {
         </div>
       </header>
 
-      <section className="max-w-6xl mx-auto px-4 pt-6">
+      {/* Search + filters */}
+      <section className="max-w-7xl mx-auto px-6 pt-6">
         <Card>
           <CardContent className="pt-4 space-y-3">
             <div className="flex flex-col md:flex-row gap-2">
@@ -201,7 +216,8 @@ export default function Page() {
         </Card>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 py-6 grid lg:grid-cols-3 gap-6">
+      {/* Main + Sidebar */}
+      <section className="max-w-7xl mx-auto px-6 py-6 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           {featured && <EventCard evt={featured} large />}
           <div className="grid md:grid-cols-2 gap-4">
@@ -230,8 +246,9 @@ export default function Page() {
         </aside>
       </section>
 
+      {/* Footer */}
       <footer className="border-t">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-slate-600 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-8 text-sm text-slate-600 flex items-center justify-between">
           <p>© {new Date().getFullYear()} LexScopic. Curated in Lexington, KY.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:underline">About</a>
@@ -241,6 +258,7 @@ export default function Page() {
         </div>
       </footer>
 
+      {/* Jotform embed: replace YOUR_FORM_ID when ready */}
       <Modal open={openSubmit} onClose={() => setOpenSubmit(false)} title="Submit an Event">
         <iframe
           src="https://form.jotform.com/YOUR_FORM_ID"
