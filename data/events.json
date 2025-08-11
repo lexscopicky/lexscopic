@@ -1,56 +1,30 @@
 [
   {
-    "id": "1",
-    "title": "Phoenix Park Lunch Beats",
-    "date": "2025-08-11",
-    "startTime": "12:00 PM",
-    "endTime": "1:00 PM",
-    "venue": "Phoenix Park",
+    "id": "1001",
+    "title": "Thursday Night Live",
+    "date": "2025-08-14",
+    "startTime": "5:00 PM",
+    "endTime": "8:00 PM",
+    "venue": "Fifth Third Pavilion",
     "neighborhood": "Downtown",
     "price": 0,
-    "tags": [
-      "music",
-      "outdoors",
-      "family"
-    ],
-    "description": "Midday DJ set with local artists. Grab a bite and vibe.",
-    "url": "https://example.com/event/lunch-beats",
-    "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1600&auto=format&fit=crop"
+    "tags": ["music","family","outdoors"],
+    "description": "Live music and local vendors on the pavilion.",
+    "url": "https://example.com/thursday-night-live",
+    "image": "/uploads/tnl.jpg"
   },
   {
-    "id": "2",
-    "title": "Free Museum Sunday at LASC",
-    "date": "2025-08-12",
-    "startTime": "10:00 AM",
-    "endTime": "5:00 PM",
-    "venue": "Living Arts & Science Center",
-    "neighborhood": "Northside",
+    "id": "1002",
+    "title": "Picnic at the Arboretum",
+    "date": "2025-08-16",
+    "startTime": "11:00 AM",
+    "endTime": "2:00 PM",
+    "venue": "UK Arboretum",
+    "neighborhood": "Campus",
     "price": 0,
-    "tags": [
-      "arts",
-      "kids",
-      "education"
-    ],
-    "description": "Hands-on exhibits and planetarium shows. Free admission day.",
-    "url": "https://example.com/event/lasc-free",
-    "image": "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=1600&auto=format&fit=crop"
-  },
-  {
-    "id": "3",
-    "title": "Legacy Trail Community Ride",
-    "date": "2025-08-13",
-    "startTime": "9:00 AM",
-    "endTime": "11:00 AM",
-    "venue": "Legacy Trailhead (Coldstream Park)",
-    "neighborhood": "North Lexington",
-    "price": 0,
-    "tags": [
-      "outdoors",
-      "fitness",
-      "family"
-    ],
-    "description": "All levels welcome. Bring water, helmet, and a friend.",
-    "url": "https://example.com/event/legacy-ride",
-    "image": "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?q=80&w=1600&auto=format&fit=crop"
+    "tags": ["outdoors","family"],
+    "description": "Bring a blanket and enjoy the gardens.",
+    "url": "https://example.com/arboretum-picnic",
+    "image": "/uploads/arboretum.jpg"
   }
 ]
