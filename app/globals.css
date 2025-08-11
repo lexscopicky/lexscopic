@@ -3,4 +3,10 @@
 @tailwind utilities;
 
 :root { --radius: 16px; }
-body { background-image: linear-gradient(to bottom, #ffffff, #f8fafc); color: #0f172a; }
+
+html, body { color: #0f172a; background: #fff; }
+
+a { color: #0033a0; }
+a:hover { text-decoration: underline; }
+
+h1, h2, h3 { letter-spacing: -0.01em; }
