@@ -2,7 +2,10 @@
 
 import { useMemo, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Clock, MapPin, Ticket, Star, Search, Filter, PlusCircle, ArrowUpRight, Heart, Leaf, Music, Bike } from 'lucide-react'
+import {
+  Calendar, Clock, MapPin, Ticket, Star, Search, Filter, PlusCircle,
+  ArrowUpRight, Heart, Leaf, Music, Bike, Newspaper
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -43,6 +46,8 @@ function TagPill({ tag }: { tag: string }) {
   return <Badge className="gap-1 px-2 py-1 rounded-full text-xs">{meta.icon}<span>{meta.label}</span></Badge>
 }
 
+/* ======= Cards ======= */
+
 function EventCard({ evt, large = false }: { evt: EventItem; large?: boolean }) {
   const priceText = formatMoney(evt.price)
   const weekend = isThisWeekend(evt.date)
@@ -56,19 +61,13 @@ function EventCard({ evt, large = false }: { evt: EventItem; large?: boolean }) 
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}%2F${end}&details=${details}&location=${location}`
   })()
 
-  // Tidy card + consistent image ratios (no more giant images)
-  const aspectStyle = { aspectRatio: large ? '16 / 9' as const : '4 / 3' as const }
+  const aspectStyle = { aspectRatio: large ? '16 / 9' : '4 / 3' }
 
   return (
     <motion.div layout>
       <div className="overflow-hidden rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow">
-        {/* Image with fixed aspect ratio */}
         <div className="relative w-full overflow-hidden" style={aspectStyle}>
-          <img
-            src={evt.image || '/og.png'}
-            alt={evt.title}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          <img src={evt.image || '/og.png'} alt={evt.title} className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 ring-1 ring-black/5" />
           <div className="absolute top-2 left-2 flex items-center gap-2">
             {evt.sponsored && <Badge className="bg-yellow-400 text-black">Sponsored</Badge>}
@@ -120,6 +119,66 @@ function EventCard({ evt, large = false }: { evt: EventItem; large?: boolean }) 
   )
 }
 
+function HeroCard({ evt }: { evt: EventItem }) {
+  if (!evt) return null
+  const priceText = formatMoney(evt.price)
+  return (
+    <div className="relative overflow-hidden rounded-2xl border bg-slate-900 text-white">
+      <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+        <img src={evt.image || '/og.png'} alt={evt.title} className="absolute inset-0 h-full w-full object-cover" />
+        {/* dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+          <div className="flex items-center gap-2 mb-3">
+            {evt.tags?.slice(0, 2).map(t => (
+              <span key={t} className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur">
+                {TAG_META[t]?.label || t}
+              </span>
+            ))}
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight">
+            <a href={evt.url} target="_blank" rel="noreferrer" className="hover:underline">{evt.title}</a>
+          </h2>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/90">
+            <span className="inline-flex items-center gap-2"><Calendar className="w-4 h-4" />{new Date(evt.date).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' })}</span>
+            <span className="inline-flex items-center gap-2"><Clock className="w-4 h-4" />{evt.startTime} – {evt.endTime}</span>
+            <span className="inline-flex items-center gap-2"><MapPin className="w-4 h-4" />{evt.venue}</span>
+            <span className="inline-flex items-center gap-2"><Ticket className="w-4 h-4" />{priceText}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SectionHeader({ icon, title }: { icon: ReactNode; title: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-brand-50 text-brand-700">{icon}</div>
+        <h3 className="text-lg font-bold">{title}</h3>
+      </div>
+      <div className="h-0.5 flex-1 ml-4 bg-gradient-to-r from-brand-200 to-transparent rounded-full" />
+    </div>
+  )
+}
+
+function SectionBlock({ title, icon, items }: { title: string; icon: ReactNode; items: EventItem[] }) {
+  if (!items?.length) return null
+  return (
+    <div className="space-y-3">
+      <SectionHeader icon={icon} title={title} />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AnimatePresence>
+          {items.slice(0, 6).map(evt => <EventCard key={evt.id} evt={evt} />)}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+/* ======= Page ======= */
+
 export default function Page() {
   const [query, setQuery] = useState('')
   const [maxPrice, setMaxPrice] = useState<number>(999)
@@ -155,6 +214,12 @@ export default function Page() {
   const featured = filtered[0]
   const rest = filtered.slice(1)
 
+  // Section groupings by tag
+  const music = rest.filter(e => e.tags?.includes('music'))
+  const outdoors = rest.filter(e => e.tags?.includes('outdoors'))
+  const family = rest.filter(e => e.tags?.includes('family'))
+  const arts = rest.filter(e => e.tags?.includes('arts') || e.tags?.includes('kids'))
+
   const handleSubmit = () => {
     const clean = { ...form, id: String(Date.now()), tags: (form.tags || []).map(t => t.toString().toLowerCase()) }
     setEvents(prev => [clean, ...prev]); setOpenSubmit(false)
@@ -163,7 +228,7 @@ export default function Page() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
+      {/* Top header */}
       <header className="sticky top-0 z-40 backdrop-blur bg-white/70 border-b">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -178,7 +243,7 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Search + filters */}
+      {/* Search strip */}
       <section className="max-w-7xl mx-auto px-6 pt-6">
         <Card>
           <CardContent className="pt-4 space-y-3">
@@ -216,12 +281,15 @@ export default function Page() {
         </Card>
       </section>
 
-      {/* Main + Sidebar */}
+      {/* Hero + Sidebar */}
       <section className="max-w-7xl mx-auto px-6 py-6 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          {featured && <EventCard evt={featured} large />}
-          <div className="grid md:grid-cols-2 gap-4">
-            <AnimatePresence>{rest.map(evt => <EventCard key={evt.id} evt={evt} />)}</AnimatePresence>
+          {featured && <HeroCard evt={featured} />}
+          {/* Below hero: a quick row of two more cards if available */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <AnimatePresence>
+              {rest.slice(0, 2).map(evt => <EventCard key={evt.id} evt={evt} />)}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -244,6 +312,14 @@ export default function Page() {
             </CardContent>
           </Card>
         </aside>
+      </section>
+
+      {/* Sections */}
+      <section className="max-w-7xl mx-auto px-6 pb-10 space-y-10">
+        <SectionBlock title="Music" icon={<Music className="w-4 h-4" />} items={music} />
+        <SectionBlock title="Outdoors" icon={<Leaf className="w-4 h-4" />} items={outdoors} />
+        <SectionBlock title="Family" icon={<Heart className="w-4 h-4" />} items={family} />
+        <SectionBlock title="Arts & Culture" icon={<Newspaper className="w-4 h-4" />} items={arts} />
       </section>
 
       {/* Footer */}
