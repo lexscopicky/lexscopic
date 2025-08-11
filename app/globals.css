@@ -2,11 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Base */
 :root { --radius: 16px; }
 
-html, body { color: #0f172a; background: #fff; }
+html, body {
+  background: #fff;
+  color: #0f172a; /* slate-900-ish */
+}
 
+/* Links */
 a { color: #0033a0; }
 a:hover { text-decoration: underline; }
 
+/* Headlines */
 h1, h2, h3 { letter-spacing: -0.01em; }
+
+/* Helpers */
+.card-shadow { box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06); }
+
+/* Simple 2-line clamp without plugin */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
